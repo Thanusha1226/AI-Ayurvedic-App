@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingHorizontal="15dp"
+    tools:context=".App.Froget_Password.ForgetPasswordActivity">
+
+    <ImageView
+        android:id="@+id/loginIcon"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/passreset"
+         />
+
+    <TextView
+        android:id="@+id/signup"
+        android:layout_below="@id/loginIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recover Password"
+        android:layout_marginTop="30dp"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="#0F2D53"/>
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_below="@id/signup"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" />
+
+    <EditText
+        android:id="@+id/editEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvStatus"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/rounded_edittext"
+        android:elevation="0.2dp"
+        android:hint="Registered email"
+        android:inputType="textEmailAddress"
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="#BDB5B5" />
+
+    <Button
+        android:id="@+id/resetPassButtn"
+        android:layout_below="@id/editEmail"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="#0F2D53"
+        android:textColor="@color/white"
+        android:text="Send Recovery Email" />
+
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:text="HerbalEyes © 2025 Created by Thanusha Deemantha"
+        android:textAlignment="center"
+        android:textColor="#222"
+        android:textSize="12dp" />
+</RelativeLayout>

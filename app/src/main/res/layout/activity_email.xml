@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingHorizontal="15dp"
+    android:padding="16dp"
+    tools:context=".App.Froget_Password.UserActivity">
+
+    <ImageView
+        android:id="@+id/loginIcon"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/emailact"
+         />
+
+
+    <TextView
+        android:id="@+id/verificaiontxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recover Password!"
+        android:layout_marginTop="30dp"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="#0F2D53"
+        android:layout_below="@id/loginIcon" />
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/verificaiontxt" />
+
+    <net.rimoto.intlphoneinput.IntlPhoneInput
+        android:id="@+id/my_phone_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvStatus"
+        app:textSize="14sp"
+        app:textColor="#000000"
+        android:maxLines="1"
+        app:flagPaddingStart="4dp"
+        app:flagPaddingTop="4dp"
+        app:flagPaddingEnd="4dp"
+        app:flagPaddingBottom="4dp" />
+
+    <Button
+        android:id="@+id/submitCode"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="#0F2D53"
+        android:textColor="@color/white"
+        android:text="Submit"
+        android:layout_below="@id/my_phone_input"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentEnd="true" />
+
+
+
+    <TextView
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp"
+        android:text="HerbalEyes © 2025 Created by Thanusha Deemantha"
+        android:textAlignment="center"
+        android:textColor="#222"
+        android:textSize="12dp" />
+
+</RelativeLayout>

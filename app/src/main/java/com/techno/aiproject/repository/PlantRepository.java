@@ -12,8 +12,8 @@ import com.techno.aiproject.api.ApiClient;
 import com.techno.aiproject.database.AppDatabase;
 import com.techno.aiproject.database.FavoritePlant;
 import com.techno.aiproject.database.PlantHistory;
+import com.techno.aiproject.utils.PrefManager;
 import com.techno.aiproject.models.GeminiRequest;
-import com.techno.aiproject.utils.CheckConnection;
 import com.techno.aiproject.models.GeminiResponse;
 import com.techno.aiproject.models.PlantNetResponse;
 import com.techno.aiproject.utils.Constants;
@@ -35,6 +35,7 @@ public class PlantRepository {
     private static final String TAG = "PlantRepository";
     private final Context context;
     private final AppDatabase database;
+    private final PrefManager prefManager;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -47,6 +48,7 @@ public class PlantRepository {
     public PlantRepository(Context context) {
         this.context = context.getApplicationContext();
         this.database = AppDatabase.getInstance(this.context);
+        this.prefManager = new PrefManager(this.context);
     }
 
     public void identifyAndAnalyze(final String imagePath, final String language, final PipelineCallback callback) {
@@ -55,6 +57,21 @@ public class PlantRepository {
             public void run() {
                 if (!isConnected()) {
                     postError(callback, "Please connect to the internet and try again.");
+                    return;
+                }
+
+                // Check Gemini API request limit
+                if (!prefManager.canPerformGeminiRequest()) {
+                    long remainingMs = prefManager.getGeminiCooldownRemainingTime();
+                    long hours = remainingMs / (1000 * 60 * 60);
+                    long minutes = (remainingMs % (1000 * 60 * 60)) / (1000 * 60);
+                    String message;
+                    if (hours > 0) {
+                        message = String.format("Gemini API request limit reached! You can identify plants again in %d hours and %d minutes.", hours, minutes);
+                    } else {
+                        message = String.format("Gemini API request limit reached! You can identify plants again in %d minutes.", minutes);
+                    }
+                    postError(callback, message);
                     return;
                 }
 
@@ -125,6 +142,9 @@ public class PlantRepository {
                 .enqueue(new retrofit2.Callback<GeminiResponse>() {
                     @Override
                     public void onResponse(Call<GeminiResponse> call, Response<GeminiResponse> response) {
+                        // Increment Gemini request counter on any response (success or failure)
+                        prefManager.incrementGeminiRequestCount();
+                        
                         if (response.isSuccessful() && response.body() != null) {
                             String resultText = response.body().getText().trim();
                             if (resultText.toUpperCase().contains("NOT_A_PLANT")) {
@@ -154,6 +174,8 @@ public class PlantRepository {
 
                     @Override
                     public void onFailure(Call<GeminiResponse> call, Throwable t) {
+                        // Increment Gemini request counter on failure as well
+                        prefManager.incrementGeminiRequestCount();
                         postError(callback, "Plant identification network error: " + t.getMessage());
                     }
                 });
@@ -193,6 +215,11 @@ public class PlantRepository {
                 .enqueue(new retrofit2.Callback<GeminiResponse>() {
                     @Override
                     public void onResponse(Call<GeminiResponse> call, Response<GeminiResponse> response) {
+                        // Increment Gemini request counter only on first attempt
+                        if (retryCount == 0) {
+                            prefManager.incrementGeminiRequestCount();
+                        }
+                        
                         if (response.isSuccessful() && response.body() != null) {
                             String explanation = response.body().getText();
                             executor.execute(() -> {
@@ -228,6 +255,11 @@ public class PlantRepository {
 
                     @Override
                     public void onFailure(Call<GeminiResponse> call, Throwable t) {
+                        // Increment Gemini request counter only on first attempt
+                        if (retryCount == 0) {
+                            prefManager.incrementGeminiRequestCount();
+                        }
+                        
                         // Retry on timeout or network errors
                         if (retryCount < MAX_RETRIES) {
                             Log.w(TAG, "Gemini request failed: " + t.getMessage() + ". Retrying... (Attempt " + (retryCount + 2) + "/" + (MAX_RETRIES + 1) + ")");

@@ -25,6 +25,7 @@ import com.techno.aiproject.R;
 import com.techno.aiproject.database.PlantHistory;
 import com.techno.aiproject.utils.MarkdownUtils;
 import com.techno.aiproject.utils.PrefManager;
+import com.techno.aiproject.utils.ErrorMessageUtils;
 import com.techno.aiproject.viewmodel.FavoritesViewModel;
 import com.techno.aiproject.viewmodel.IdentifyViewModel;
 
@@ -142,6 +143,11 @@ public class ResultsActivity extends AppCompatActivity {
                 if (!scanCounted) {
                     prefManager.incrementScanCount();
                     scanCounted = true;
+                    
+                    // Show remaining API requests with multilingual support
+                    int remaining = prefManager.getRemainingGeminiRequests();
+                    String message = ErrorMessageUtils.getAnalysisCompleteMessage(remaining, selectedLanguage);
+                    Toast.makeText(ResultsActivity.this, message, Toast.LENGTH_SHORT).show();
                 }
             }
         });

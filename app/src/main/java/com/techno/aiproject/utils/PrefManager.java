@@ -20,6 +20,8 @@ public class PrefManager {
     private static final String KEY_DARK_MODE = "darkMode";
     private static final String KEY_SCAN_COUNT = "scanCount";
     private static final String KEY_FIRST_SCAN_TIMESTAMP = "firstScanTimestamp";
+    private static final String KEY_GEMINI_REQUEST_COUNT = "geminiRequestCount";
+    private static final String KEY_FIRST_GEMINI_REQUEST_TIMESTAMP = "firstGeminiRequestTimestamp";
 
     public PrefManager(Context context) {
         SharedPreferences prefs;
@@ -166,6 +168,96 @@ public class PrefManager {
         }
 
         long elapsedTime = currentTime - firstScanTime;
+        long limitTime = 24 * 60 * 60 * 1000;
+        if (elapsedTime >= limitTime) {
+            return 0;
+        }
+
+        return limitTime - elapsedTime;
+    }
+
+    /**
+     * Checks if a Gemini API request can be performed (limit: 3 per 24 hours)
+     */
+    public boolean canPerformGeminiRequest() {
+        long currentTime = System.currentTimeMillis();
+        long firstRequestTime = sharedPreferences.getLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, 0);
+        int count = sharedPreferences.getInt(KEY_GEMINI_REQUEST_COUNT, 0);
+
+        if (firstRequestTime == 0) {
+            return true;
+        }
+
+        long elapsedTime = currentTime - firstRequestTime;
+        if (elapsedTime >= 24 * 60 * 60 * 1000) {
+            // 24 hours have passed, reset cycle
+            editor.putLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, 0);
+            editor.putInt(KEY_GEMINI_REQUEST_COUNT, 0);
+            editor.apply();
+            return true;
+        }
+
+        return count < 3;
+    }
+
+    /**
+     * Increments the Gemini API request count
+     */
+    public void incrementGeminiRequestCount() {
+        long currentTime = System.currentTimeMillis();
+        long firstRequestTime = sharedPreferences.getLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, 0);
+        int count = sharedPreferences.getInt(KEY_GEMINI_REQUEST_COUNT, 0);
+
+        if (firstRequestTime == 0) {
+            // Start of a new 24-hour cycle
+            editor.putLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, currentTime);
+            editor.putInt(KEY_GEMINI_REQUEST_COUNT, 1);
+        } else {
+            long elapsedTime = currentTime - firstRequestTime;
+            if (elapsedTime >= 24 * 60 * 60 * 1000) {
+                // Reset cycle
+                editor.putLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, currentTime);
+                editor.putInt(KEY_GEMINI_REQUEST_COUNT, 1);
+            } else {
+                editor.putInt(KEY_GEMINI_REQUEST_COUNT, count + 1);
+            }
+        }
+        editor.apply();
+    }
+
+    /**
+     * Gets remaining Gemini API requests for the current 24-hour period
+     */
+    public int getRemainingGeminiRequests() {
+        long currentTime = System.currentTimeMillis();
+        long firstRequestTime = sharedPreferences.getLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, 0);
+        int count = sharedPreferences.getInt(KEY_GEMINI_REQUEST_COUNT, 0);
+
+        if (firstRequestTime == 0) {
+            return 3;
+        }
+
+        long elapsedTime = currentTime - firstRequestTime;
+        if (elapsedTime >= 24 * 60 * 60 * 1000) {
+            return 3;
+        }
+
+        return Math.max(0, 3 - count);
+    }
+
+    /**
+     * Gets cooldown time remaining for Gemini API (in milliseconds)
+     */
+    public long getGeminiCooldownRemainingTime() {
+        long currentTime = System.currentTimeMillis();
+        long firstRequestTime = sharedPreferences.getLong(KEY_FIRST_GEMINI_REQUEST_TIMESTAMP, 0);
+        int count = sharedPreferences.getInt(KEY_GEMINI_REQUEST_COUNT, 0);
+
+        if (firstRequestTime == 0 || count < 3) {
+            return 0;
+        }
+
+        long elapsedTime = currentTime - firstRequestTime;
         long limitTime = 24 * 60 * 60 * 1000;
         if (elapsedTime >= limitTime) {
             return 0;

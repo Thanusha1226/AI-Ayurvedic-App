@@ -24,6 +24,7 @@ import androidx.core.content.FileProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.techno.aiproject.R;
+import com.techno.aiproject.utils.ErrorMessageUtils;
 import com.techno.aiproject.utils.Constants;
 import com.techno.aiproject.utils.PrefManager;
 
@@ -135,6 +136,17 @@ public class HomeActivity extends AppCompatActivity {
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_home);
         }
+        updateRemainingRequestsDisplay();
+    }
+
+    private void updateRemainingRequestsDisplay() {
+        int remainingRequests = prefManager.getRemainingGeminiRequests();
+        int remainingScans = 3 - (prefManager.canPerformScan() ? 0 : 3); // Simple way to check used scans
+        
+        // Show a toast or update UI if requests are low
+        if (remainingRequests == 1) {
+            Toast.makeText(this, "⚠️ Warning: Only 1 Gemini API request remaining today!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void checkCameraPermissionAndCapture() {
@@ -226,19 +238,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private boolean checkScanLimit() {
+        String currentLanguage = prefManager.getLanguage();
+
+        // Check scan (upload) limit first
         if (!prefManager.canPerformScan()) {
             long remainingMs = prefManager.getScanCooldownRemainingTime();
-            long hours = remainingMs / (1000 * 60 * 60);
-            long minutes = (remainingMs % (1000 * 60 * 60)) / (1000 * 60);
-            String message;
-            if (hours > 0) {
-                message = String.format("Scan limit reached! Please wait %d hours and %d minutes.", hours, minutes);
-            } else {
-                message = String.format("Scan limit reached! Please wait %d minutes.", minutes);
-            }
+            String message = ErrorMessageUtils.getScanLimitReachedMessage(remainingMs, currentLanguage);
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             return false;
         }
+
+        // Check Gemini API request limit
+        if (!prefManager.canPerformGeminiRequest()) {
+            long remainingMs = prefManager.getGeminiCooldownRemainingTime();
+            String message = ErrorMessageUtils.getGeminiLimitReachedMessage(remainingMs, currentLanguage);
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         return true;
     }
 

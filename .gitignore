@@ -13,4 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
-/.app/.src/main/java/com/techno/aiproject/utils/Constants.java
+app/src/main/java/com/techno/aiproject/utils/Constants.java
+UPGRADE_DOCUMENTATION.md

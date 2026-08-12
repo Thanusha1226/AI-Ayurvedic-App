@@ -5,51 +5,290 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Install My App</title>
     <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0f1620;
+            --surface: rgba(255, 255, 255, 0.08);
+            --surface-strong: rgba(255, 255, 255, 0.14);
+            --text: #f7fafc;
+            --muted: #b8c2d3;
+            --accent: #4fd9a0;
+            --accent-2: #5d7cff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top left, rgba(79, 217, 160, 0.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(93, 124, 255, 0.18), transparent 32%),
+                linear-gradient(180deg, #102037 0%, #0b1220 100%);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .page {
+            position: relative;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 64px 36px;
+            border-radius: 36px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22);
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.55;
+            filter: blur(22px);
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .hero::before {
+            width: 240px;
+            height: 240px;
+            top: -80px;
+            left: -60px;
+            background: radial-gradient(circle, rgba(79, 217, 160, 0.88), transparent 58%);
+        }
+
+        .hero::after {
+            width: 300px;
+            height: 300px;
+            bottom: -110px;
+            right: -80px;
+            background: radial-gradient(circle, rgba(93, 124, 255, 0.85), transparent 55%);
+            animation-duration: 14s;
+        }
+
+        .hero-top {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 24px;
+            align-items: center;
             text-align: center;
-            padding: 40px 20px;
-            background: #f5f5f5;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #d7e0f0;
+            font-size: 0.95rem;
+            width: fit-content;
+            justify-self: center;
+        }
+
+        .badge span {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 20px rgba(79, 217, 160, 0.45);
         }
 
         h1 {
-            color: #333;
+            margin: 0;
+            font-size: clamp(2.6rem, 5vw, 4.4rem);
+            line-height: 1.02;
+            letter-spacing: -0.04em;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 36px;
         }
 
         .btn {
-            display: inline-block;
-            background: #4CAF50;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 40px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             color: white;
-            padding: 18px 45px;
-            font-size: 20px;
             text-decoration: none;
-            border-radius: 12px;
-            margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+            box-shadow: 0 18px 40px rgba(79, 217, 160, 0.24);
         }
 
-        .btn:active {
-            background: #45a049;
+        .btn:hover,
+        .btn:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: 0 24px 50px rgba(79, 217, 160, 0.28);
+            filter: brightness(1.05);
         }
 
-        p {
-            color: #666;
-            margin-top: 30px;
-            font-size: 15px;
+        .hint {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.975rem;
+            margin-top: 22px;
+        }
+
+        .feature-grid {
+            display: grid;
+            gap: 18px;
+            margin-top: 46px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+            padding: 26px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            min-height: 180px;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(79, 217, 160, 0.24), transparent 40%);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .feature-card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-icon {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-title {
+            margin: 0 0 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .feature-text {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 0.98rem;
+        }
+
+        .footer-note {
+            margin-top: 42px;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.95rem;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-18px) rotate(6deg);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                padding: 40px 22px;
+            }
+
+            .button-row {
+                gap: 12px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <h1>Ayurvedic App Powered by AI</h1>
-    <p>Click the button below to install the app</p>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-top">
+                <span class="badge"><span></span>Ayurvedic AI companion</span>
+                <h1>Ayurvedic App Powered by AI</h1>
+                <p class="subtitle">Experience a modern Ayurveda landing page with intelligent guidance, wellness
+                    routines, and an easy one-tap install flow. Designed for mobile users and polished with animated UI
+                    accents.</p>
+                <div class="button-row">
+                    <a class="btn"
+                        href="https://github.com/Thanusha1226/AI-Ayurvedic-App/releases/download/Version01/app-release.apk">Install
+                        App</a>
+                </div>
+                <p class="hint">After downloading, tap <strong>Install</strong> when the phone asks and allow the app to
+                    complete installation.</p>
+            </div>
 
-    <!-- Replace the link below with your real APK link -->
-    <a class="btn"
-        href="https://github.com/Thanusha1226/AI-Ayurvedic-App/releases/download/Version01/app-release.apk">Install
-        App</a>
-
-    <p>After downloading, tap <b>Install</b> when the phone asks</p>
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">🧘</div>
+                    <h2 class="feature-title">Personalized routines</h2>
+                    <p class="feature-text">Get AI-powered Ayurvedic plans tailored to your dosha, schedule, and
+                        lifestyle.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon">🌿</div>
+                    <h2 class="feature-title">Herbal guidance</h2>
+                    <p class="feature-text">Discover natural remedies, diet tips, and herbal support for daily wellness.
+                    </p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h2 class="feature-title">Smooth install</h2>
+                    <p class="feature-text">Tap the button to download the APK instantly and complete the app setup on
+                        your phone.</p>
+                </article>
+            </div>
+            <p class="footer-note">This page is a simple app landing experience. Replace the link if you want to publish
+                a signed APK or use your own app store distribution.</p>
+        </section>
+    </main>
 </body>
 
 </html>
